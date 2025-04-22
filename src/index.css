@@ -78,7 +78,14 @@
 }
 
 
-.selected-date abbr {
+.selected-date-start abbr {
+    background-color: #3695fa !important;
+    color: white !important;
+    border-radius: 50px;
+    padding: .2em .6em;
+  }
+
+  .selected-date-end abbr {
     background-color: #007bff !important;
     color: white !important;
     border-radius: 50px;
