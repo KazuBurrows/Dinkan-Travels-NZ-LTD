@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Calendar from "react-calendar";
 // import "react-calendar/dist/Calendar.css"; // Default styles
 
 import highlander from "../assets/images/22-Toyota-Highlander-White- side.PNG";
+import PopupModal from "../Components/PopupModal";
+import { Contact, Driver } from "../types/models";
 
 type Car = {
   id: string;
@@ -24,14 +26,21 @@ const car: Car = {
   img: highlander,
 };
 
-const bookedDates = [
-  new Date(2025, 3, 19), // April is month 3 (0-indexed)
-  new Date(2025, 3, 20),
-  new Date(2025, 3, 21),
-  new Date(2025, 3, 22),
-  new Date(2025, 3, 23),
-  new Date(2025, 3, 24),
-];
+// types.ts
+export interface Booking {
+  id: string;
+  customer_id: string;
+  car_id: string;
+  pickup_date: string;
+  dropoff_date: string;
+  total_price: number;
+  paid_total: number;
+  _rid: string;
+  _self: string;
+  _etag: string;
+  _attachments: string;
+  _ts: number;
+}
 
 function formatDateToNZString(date: Date | null): string {
   if (!date) return "";
@@ -73,6 +82,12 @@ function calculateTotalPrice(
 }
 
 function GeneralBooking() {
+  const [contactFirstName, setContactFirstName] = useState("");
+  const [contactLastName, setContactLastName] = useState("");
+  const [contactEmail, setContactEmail] = useState("");
+  const [contactMobile, setContactMobile] = useState("");
+
+  const [bookedDates, setBookedDates] = useState<Date[]>([]);
   const setBookingDate = (value: Date) => {
     if (bookingDates[0] && bookingDates[1]) {
       // if both 'startDate' and 'endDate' values are set
@@ -91,19 +106,116 @@ function GeneralBooking() {
     null,
   ]);
 
+  function getDateRange(startDate: Date, endDate: Date) {
+    const dates = [];
+    const currentDate = new Date(startDate);
+
+    while (currentDate <= endDate) {
+      dates.push(new Date(currentDate)); // clone the date
+      currentDate.setDate(currentDate.getDate() + 1); // go to next day
+    }
+
+    return dates;
+  }
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
+
+  const handleConfirm = async () => {
+    let pickupDate = bookingDates[0];
+    let dropoffDate = bookingDates[1];
+
+    let contact: Contact = {
+      email: contactFirstName,
+      firstName: contactLastName,
+      lastName: contactEmail,
+      mobile: contactMobile,
+    };
+
+    let drivers: Driver[] = [
+      { email: "kazuki.burrows@gmail.com", fullName: "Kazuki Burrows" },
+    ];
+
+    const url = "http://localhost:7071/api/PostBooking"; // Your Azure API endpoint
+
+    const bookingRequest = {
+      pickupDate: pickupDate,
+      dropoffDate: dropoffDate,
+      contact: contact,
+      drivers: drivers,
+    };
+
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(bookingRequest), // Convert JS object to JSON
+      });
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const result = await response.json(); // Parse the response as JSON
+      console.log(result); // Handle the result (e.g., display message, update state)
+    } catch (error) {
+      console.error("Error:", error);
+    }
+
+    closeModal();
+  };
+
+  const addDriver = () => {
+    console.log("Button clicked!");
+  };
+
+  useEffect(() => {
+    const fetchBookings = async () => {
+      try {
+        const response = await fetch("http://localhost:7071/api/GetBookings");
+        if (!response.ok) {
+          throw new Error("Failed to fetch bookings");
+        }
+
+        const data: Booking[] = await response.json();
+        console.log(data);
+
+        data.forEach((booking) => {
+          setBookedDates([
+            ...bookedDates,
+            ...getDateRange(
+              new Date(booking.pickup_date),
+              new Date(booking.dropoff_date)
+            ),
+          ]);
+        });
+      } catch (err: any) {
+        // setError(err.message || "Unknown error");
+      } finally {
+        // setLoading(false);
+      }
+    };
+
+    // fetchBookings();
+  }, []);
+
   return (
     <div className="h-full bg-neutral-100 px-16 py-8 inter-font">
       <div className="h-[600px] relative my-6 mx-auto flex justify-center items-center gap-x-4">
         <div className="flex-[4] text-center flex flex-col justify-center bg-white rounded-3xl h-full">
           <Calendar
             onChange={(val) => {
-              console.log(val);
+              // console.log(val);
               if (val instanceof Date) {
                 // setValue(val);
                 setBookingDate(val);
               }
             }}
-            value={bookedDates[0]}
+            value={bookingDates[0]}
             tileDisabled={({ date }) =>
               bookedDates.some((d) => d.toDateString() === date.toDateString())
             }
@@ -117,7 +229,7 @@ function GeneralBooking() {
               ) {
                 classes.push("booked-date");
               }
-              console.log(bookingDates[0] + " : " + bookingDates[1]);
+              // console.log(bookingDates[0] + " : " + bookingDates[1]);
 
               if (
                 bookingDates[0] instanceof Date &&
@@ -190,30 +302,112 @@ function GeneralBooking() {
           </div>
         </div>
       </div>
-      <div className="bg-white rounded-3xl px-16 py-8">
-        <form>
-          <div className="flex gap-8">
-            <div className="flex flex-col flex-[1]">
-              <label className="ml-2 text-lg text-neutral-600">First Name</label>
-              <input className="bg-neutral-100 rounded-full px-4 py-2" />
+
+      <div className="flex gap-x-4">
+        <div className="flex-[2] bg-white rounded-3xl px-16 py-8">
+          <div className="gap-8">
+            <h2 className="text-3xl font-semibold text-center my-4">Drivers</h2>
+            <div id="drivers">
+              <div id="driver-1">
+                <div className="flex flex-col flex-[1] my-4">
+                  <label className="ml-2 text-lg text-neutral-600">
+                    Full Name
+                  </label>
+                  <input
+                    className="bg-neutral-100 rounded-full px-4 py-2"
+                    value={"Kazuki Burrows"}
+                  />
+                </div>
+                <div className="flex flex-col flex-[1] my-4">
+                  <label className="ml-2 text-lg text-neutral-600">Email</label>
+                  <input
+                    className="bg-neutral-100 rounded-full px-4 py-2"
+                    value={"kazuki.burrows@gmail.com"}
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <div className="flex flex-col flex-[1] my-4">
+                    <label className="ml-2 text-lg text-neutral-600">
+                      Driver License(Front)
+                    </label>
+                    <input
+                      type="file"
+                      className="bg-neutral-100 rounded-xl px-4 py-2"
+                    />
+                  </div>
+                  <div className="flex flex-col flex-[1] my-4">
+                    <label className="ml-2 text-lg text-neutral-600">
+                      Driver License(Back)
+                    </label>
+                    <input
+                      type="file"
+                      className="bg-neutral-100 rounded-xl px-4 py-2"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="flex flex-col flex-[1]">
-              <label className="ml-2 text-lg text-neutral-600">First Name</label>
-              <input className="bg-neutral-100 rounded-full px-4 py-2" />
-            </div>
+            {/* <div className="flex justify-center my-4">
+              <button
+                className="bg-green-300 py-2 px-4 text-xl text-white font-bold rounded-full"
+                onClick={addDriver}
+              >
+                +
+              </button>
+            </div>{" "} */}
           </div>
-          <div className="flex gap-8">
-            <div className="flex flex-col flex-[1]">
-              <label className="ml-2 text-lg text-neutral-600">Email</label>
-              <input className="bg-neutral-100 rounded-full px-4 py-2" />
+        </div>
+        <form className="flex-[2] bg-white rounded-3xl px-16 py-8">
+          <h2 className="text-3xl font-semibold text-center my-4">
+            Contact Information
+          </h2>
+          <div className="gap-8">
+            <div className="flex flex-col flex-[1] my-4">
+              <label className="ml-2 text-lg text-neutral-600">
+                First Name
+              </label>
+              <input
+                className="bg-neutral-100 rounded-full px-4 py-2"
+                onChange={(e) => setContactFirstName(e.target.value)}
+              />
             </div>
-            <div className="flex flex-col flex-[1]">
+            <div className="flex flex-col flex-[1] my-4">
+              <label className="ml-2 text-lg text-neutral-600">Last Name</label>
+              <input
+                className="bg-neutral-100 rounded-full px-4 py-2"
+                onChange={(e) => setContactLastName(e.target.value)}
+              />
+            </div>
+            <div className="flex flex-col flex-[1] my-4">
+              <label className="ml-2 text-lg text-neutral-600">Email</label>
+              <input
+                className="bg-neutral-100 rounded-full px-4 py-2"
+                onChange={(e) => setContactEmail(e.target.value)}
+              />
+            </div>
+            <div className="flex flex-col flex-[1] my-4">
               <label className="ml-2 text-lg text-neutral-600">Mobile</label>
-              <input className="bg-neutral-100 rounded-full px-4 py-2" />
+              <input
+                className="bg-neutral-100 rounded-full px-4 py-2"
+                onChange={(e) => setContactMobile(e.target.value)}
+              />
             </div>
           </div>
         </form>
       </div>
+      <div className="flex justify-center my-4">
+        <button
+          className="bg-green-300 py-2 px-4 text-xl text-white font-bold rounded-full"
+          onClick={openModal}
+        >
+          Submit
+        </button>
+      </div>
+      <PopupModal
+        isOpen={isModalOpen}
+        onConfirm={handleConfirm}
+        onCancel={closeModal}
+      />
     </div>
   );
 }
