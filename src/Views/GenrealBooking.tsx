@@ -4,17 +4,10 @@ import Calendar from "react-calendar";
 
 import highlander from "../assets/images/22-Toyota-Highlander-White- side.PNG";
 import PopupModal from "../Components/PopupModal";
-import { Contact, Driver } from "../types/models";
+import { Contact, Driver, Booking, Car } from "../types/models";
+import PopupNewDriverModal from "../Components/PopupNewDriverModal";
 
-type Car = {
-  id: string;
-  brand: string;
-  model: string;
-  year: number;
-  seats: number;
-  price: number;
-  img: string;
-};
+
 
 const car: Car = {
   id: "2022-toyota-highlander",
@@ -25,22 +18,6 @@ const car: Car = {
   price: 120.95,
   img: highlander,
 };
-
-// types.ts
-export interface Booking {
-  id: string;
-  customer_id: string;
-  car_id: string;
-  pickup_date: string;
-  dropoff_date: string;
-  total_price: number;
-  paid_total: number;
-  _rid: string;
-  _self: string;
-  _etag: string;
-  _attachments: string;
-  _ts: number;
-}
 
 function formatDateToNZString(date: Date | null): string {
   if (!date) return "";
@@ -81,11 +58,44 @@ function calculateTotalPrice(
   return Math.round(totalPrice * 100) / 100;
 }
 
+const toFormData = (bookingRequest: any): FormData => {
+  const formData = new FormData();
+
+  // Add simple fields
+  formData.append("pickupDate", bookingRequest.pickupDate);
+  formData.append("dropoffDate", bookingRequest.dropoffDate);
+  formData.append("contact.firstName", bookingRequest.contact.firstName);
+  formData.append("contact.lastName", bookingRequest.contact.lastName);
+  formData.append("contact.mobile", bookingRequest.contact.mobile);
+  formData.append("contact.email", bookingRequest.contact.email);
+  // Add more contact fields if needed
+
+  // Add drivers (array of objects)
+  bookingRequest.drivers.forEach((driver: any, index: number) => {
+    formData.append(`drivers[${index}].fullName`, driver.fullName);
+    formData.append(`drivers[${index}].email`, driver.email);
+
+    if (driver.licenceFront) {
+      formData.append(`drivers[${index}].licenceFront`, driver.licenceFront);
+    }
+
+    if (driver.licenceBack) {
+      formData.append(`drivers[${index}].licenceBack`, driver.licenceBack);
+    }
+
+    // Append other fields as needed
+  });
+
+  return formData;
+};
+
+
+
 function GeneralBooking() {
-  const [contactFirstName, setContactFirstName] = useState("");
-  const [contactLastName, setContactLastName] = useState("");
-  const [contactEmail, setContactEmail] = useState("");
-  const [contactMobile, setContactMobile] = useState("");
+  const [contactFirstName, setContactFirstName] = useState<string>("");
+  const [contactLastName, setContactLastName] = useState<string>("");
+  const [contactEmail, setContactEmail] = useState<string>("");
+  const [contactMobile, setContactMobile] = useState<string>("");
 
   const [bookedDates, setBookedDates] = useState<Date[]>([]);
   const setBookingDate = (value: Date) => {
@@ -118,8 +128,48 @@ function GeneralBooking() {
     return dates;
   }
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // START New driver modal
+  const [isNewDriverModalOpen, setIsNewDriverModalOpen] = useState(false);
+  const openNewDriverModal = () => setIsNewDriverModalOpen(true);
+  const closeNewDriverModal = () => setIsNewDriverModalOpen(false);
 
+  const [drivers, setDrivers] = useState<Driver[]>([]);
+
+  const addDriver = (driver: Driver) => {
+    closeNewDriverModal();
+
+    const driversTable = document.getElementById(
+      "drivers-table"
+    ) as HTMLTableElement | null;
+
+    if (driversTable) {
+      // Create a new row
+      const newRow = driversTable.insertRow();
+
+      // Create Full Name cell
+      const fullNameCell = newRow.insertCell();
+      fullNameCell.textContent = driver?.fullName ?? "";
+
+      // Create Email cell
+      const emailCell = newRow.insertCell();
+      emailCell.textContent = driver?.email ?? "";
+
+      // Delete button cell
+      const deleteCell = newRow.insertCell();
+      const deleteButton = document.createElement("button");
+      deleteButton.textContent = "Delete";
+      deleteButton.onclick = () => {
+        newRow.remove();
+      };
+      deleteCell.appendChild(deleteButton);
+
+      setDrivers([...drivers, driver]);
+    }
+  };
+  // END Submission confirmation modal
+
+  // START Submission confirmation modal
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
@@ -128,17 +178,12 @@ function GeneralBooking() {
     let dropoffDate = bookingDates[1];
 
     let contact: Contact = {
-      email: contactFirstName,
-      firstName: contactLastName,
-      lastName: contactEmail,
+      email: contactEmail,
+      firstName: contactFirstName,
+      lastName: contactLastName,
       mobile: contactMobile,
     };
 
-    let drivers: Driver[] = [
-      { email: "kazuki.burrows@gmail.com", fullName: "Kazuki Burrows" },
-    ];
-
-    const url = "http://localhost:7071/api/PostBooking"; // Your Azure API endpoint
 
     const bookingRequest = {
       pickupDate: pickupDate,
@@ -147,13 +192,13 @@ function GeneralBooking() {
       drivers: drivers,
     };
 
+    const formData = toFormData(bookingRequest);
+
+    const url = "http://localhost:7071/api/PostBooking"; // Your Azure API endpoint
     try {
       const response = await fetch(url, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(bookingRequest), // Convert JS object to JSON
+        body: formData,
       });
 
       if (!response.ok) {
@@ -168,11 +213,9 @@ function GeneralBooking() {
 
     closeModal();
   };
+  // END Submission confirmation modal
 
-  const addDriver = () => {
-    console.log("Button clicked!");
-  };
-
+  
   useEffect(() => {
     const fetchBookings = async () => {
       try {
@@ -303,61 +346,38 @@ function GeneralBooking() {
         </div>
       </div>
 
-      <div className="flex gap-x-4">
-        <div className="flex-[2] bg-white rounded-3xl px-16 py-8">
+      <div className="flex gap-x-4 overflow-x-auto">
+        <PopupNewDriverModal
+          isOpen={isNewDriverModalOpen}
+          onConfirm={addDriver}
+          onCancel={closeNewDriverModal}
+        ></PopupNewDriverModal>
+        <div className="flex-[4] bg-white rounded-3xl px-16 py-8 min-w-0 overflow-hidden">
           <div className="gap-8">
             <h2 className="text-3xl font-semibold text-center my-4">Drivers</h2>
             <div id="drivers">
-              <div id="driver-1">
-                <div className="flex flex-col flex-[1] my-4">
-                  <label className="ml-2 text-lg text-neutral-600">
-                    Full Name
-                  </label>
-                  <input
-                    className="bg-neutral-100 rounded-full px-4 py-2"
-                    value={"Kazuki Burrows"}
-                  />
-                </div>
-                <div className="flex flex-col flex-[1] my-4">
-                  <label className="ml-2 text-lg text-neutral-600">Email</label>
-                  <input
-                    className="bg-neutral-100 rounded-full px-4 py-2"
-                    value={"kazuki.burrows@gmail.com"}
-                  />
-                </div>
-                <div className="flex gap-2">
-                  <div className="flex flex-col flex-[1] my-4">
-                    <label className="ml-2 text-lg text-neutral-600">
-                      Driver License(Front)
-                    </label>
-                    <input
-                      type="file"
-                      className="bg-neutral-100 rounded-xl px-4 py-2"
-                    />
-                  </div>
-                  <div className="flex flex-col flex-[1] my-4">
-                    <label className="ml-2 text-lg text-neutral-600">
-                      Driver License(Back)
-                    </label>
-                    <input
-                      type="file"
-                      className="bg-neutral-100 rounded-xl px-4 py-2"
-                    />
-                  </div>
-                </div>
-              </div>
+              <table
+                id="drivers-table"
+                className="bg-neutral-100 rounded-t-2xl justify-evenly w-full text-center"
+              >
+                <tr className="text-lg">
+                  <th className="py-2">Full Name</th>
+                  <th>Email</th>
+                  <th></th>
+                </tr>
+              </table>
             </div>
-            {/* <div className="flex justify-center my-4">
+            <div className="flex justify-center my-4">
               <button
                 className="bg-green-300 py-2 px-4 text-xl text-white font-bold rounded-full"
-                onClick={addDriver}
+                onClick={openNewDriverModal}
               >
                 +
               </button>
-            </div>{" "} */}
+            </div>{" "}
           </div>
         </div>
-        <form className="flex-[2] bg-white rounded-3xl px-16 py-8">
+        <form className="flex-[2] bg-white rounded-3xl px-16 py-8 min-w-0 overflow-hidden">
           <h2 className="text-3xl font-semibold text-center my-4">
             Contact Information
           </h2>
