@@ -205,7 +205,7 @@ function GeneralBooking() {
         throw new Error("Network response was not ok");
       }
 
-      const result = await response.json(); // Parse the response as JSON
+      // const result = await response.json(); // Parse the response as JSON
       // console.log(result); // Handle the result (e.g., display message, update state)
     } catch (error) {
       console.error("Error:", error);
