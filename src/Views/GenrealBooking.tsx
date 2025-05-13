@@ -206,7 +206,7 @@ function GeneralBooking() {
       }
 
       const result = await response.json(); // Parse the response as JSON
-      console.log(result); // Handle the result (e.g., display message, update state)
+      // console.log(result); // Handle the result (e.g., display message, update state)
     } catch (error) {
       console.error("Error:", error);
     }
