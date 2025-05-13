@@ -243,7 +243,7 @@ function GeneralBooking() {
       }
     };
 
-    // fetchBookings();
+    fetchBookings();
   }, []);
 
   return (
