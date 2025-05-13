@@ -60,7 +60,7 @@ const AdminBookings = () => {
 
       <ul className="flex text-lg font-semibold gap-8 px-16">
         <li className="bg-rose-400 px-4 rounded-full">
-          <a>All</a>
+          <a href="#">All</a>
         </li>
         {/* <li>
           <a>Pending</a>

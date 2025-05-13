@@ -216,35 +216,36 @@ function GeneralBooking() {
   // END Submission confirmation modal
 
   
-  useEffect(() => {
-    const fetchBookings = async () => {
-      try {
-        const response = await fetch("http://localhost:7071/api/GetBookings");
-        if (!response.ok) {
-          throw new Error("Failed to fetch bookings");
-        }
-
-        const data: Booking[] = await response.json();
-        console.log(data);
-
-        data.forEach((booking) => {
-          setBookedDates([
-            ...bookedDates,
-            ...getDateRange(
-              new Date(booking.pickup_date),
-              new Date(booking.dropoff_date)
-            ),
-          ]);
-        });
-      } catch (err: any) {
-        // setError(err.message || "Unknown error");
-      } finally {
-        // setLoading(false);
+useEffect(() => {
+  const fetchBookings = async () => {
+    try {
+      const response = await fetch("http://localhost:7071/api/GetBookings");
+      if (!response.ok) {
+        throw new Error("Failed to fetch bookings");
       }
-    };
 
-    fetchBookings();
-  }, []);
+      const data: Booking[] = await response.json();
+      console.log(data);
+
+      data.forEach((booking) => {
+        const newDates = getDateRange(
+          new Date(booking.pickup_date),
+          new Date(booking.dropoff_date)
+        );
+
+        // use functional update to avoid stale bookedDates
+        setBookedDates(prev => [...prev, ...newDates]);
+      });
+    } catch (err: any) {
+      // setError(err.message || "Unknown error");
+    } finally {
+      // setLoading(false);
+    }
+  };
+
+  fetchBookings();
+}, []);
+
 
   return (
     <div className="h-full bg-neutral-100 px-16 py-8 inter-font">
