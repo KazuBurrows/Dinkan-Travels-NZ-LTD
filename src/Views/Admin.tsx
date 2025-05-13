@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Driver } from "../types/models";
+// import { Driver } from "../types/models";
 import AdminNav from "../Components/Admin/AdminNav";
 import AdminBookings from "../Components/Admin/AdminBookings";
 
