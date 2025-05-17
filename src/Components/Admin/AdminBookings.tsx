@@ -16,7 +16,7 @@ const AdminBookings = () => {
   useEffect(() => {
     const fetchBookings = async () => {
       try {
-        const response = await fetch("http://localhost:7071/api/GetBookings");
+        const response = await fetch("https://kazukicomapi.azurewebsites.net/api/GetBookings?");
         if (!response.ok) {
           throw new Error("Failed to fetch bookings");
         }
@@ -98,9 +98,9 @@ const AdminBookings = () => {
                     <td className="bg-rose-50 p-4 rounded-l-2xl">
                       {booking.customer_id}
                     </td>
-                    <td className="bg-rose-50">{booking.car_id}</td>
+                    <td className="bg-rose-50">2022-toyota-highlander</td>
                     <td className="bg-rose-50">
-                      {["Confirmed", "Pending", "Cancelled"][(i + 2) % 3]}
+                      
                     </td>
                     <td className="bg-rose-50">
                       {Math.round(

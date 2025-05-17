@@ -194,7 +194,7 @@ function GeneralBooking() {
 
     const formData = toFormData(bookingRequest);
 
-    const url = "http://localhost:7071/api/PostBooking"; // Your Azure API endpoint
+    const url = "https://kazukicomapi.azurewebsites.net/api/PostBooking?"; // Your Azure API endpoint
     try {
       const response = await fetch(url, {
         method: "POST",
@@ -219,7 +219,7 @@ function GeneralBooking() {
 useEffect(() => {
   const fetchBookings = async () => {
     try {
-      const response = await fetch("http://localhost:7071/api/GetBookings");
+      const response = await fetch("https://kazukicomapi.azurewebsites.net/api/GetBookings?");
       if (!response.ok) {
         throw new Error("Failed to fetch bookings");
       }
