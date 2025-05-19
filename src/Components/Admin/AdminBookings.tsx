@@ -34,6 +34,7 @@ const AdminBookings = () => {
             dropoff_date: b.dropoff_date,
             total_price: b.total_price,
             paid_total: b.paid_total,
+            status: b.status,
           };
           tempBookings.push(currBooking);
         });
@@ -100,7 +101,7 @@ const AdminBookings = () => {
                     </td>
                     <td className="bg-rose-50">2022-toyota-highlander</td>
                     <td className="bg-rose-50">
-                      
+                      {booking.status}
                     </td>
                     <td className="bg-rose-50">
                       {Math.round(

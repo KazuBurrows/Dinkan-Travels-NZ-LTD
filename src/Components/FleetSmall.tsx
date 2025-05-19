@@ -25,7 +25,7 @@ const car: Car = {
 function FleetSmall() {
   return (
     <div className="w-full py-12">
-      <h1 className="text-5xl text-[#023e7d] font-bold text-center">
+      <h1 className="text-5xl text-[#003566] font-bold text-center">
         Our Fleet
       </h1>
       <div className="relative w-8/12 h-[250px] bg-white my-6 mx-auto rounded-3xl flex justify-center items-center p-8 gap-x-4">

@@ -23,6 +23,7 @@ export interface Booking {
   dropoff_date: string;
   total_price: number;
   paid_total: number;
+  status: string;
 }
 
 
