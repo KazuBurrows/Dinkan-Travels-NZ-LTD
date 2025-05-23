@@ -1,4 +1,3 @@
-import highlander from "../assets/images/22-Toyota-Highlander-White- side.PNG";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faSquareArrowUpRight,

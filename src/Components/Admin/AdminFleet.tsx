@@ -1,6 +1,4 @@
-import highlander from "../assets/images/22-Toyota-Highlander-White- side.PNG";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSquareArrowUpRight } from "@fortawesome/free-solid-svg-icons";
+
 import { Car } from "../../types/models";
 import { useEffect, useState } from "react";
 import AdminFleetDetail from "./AdminFleetDetail";

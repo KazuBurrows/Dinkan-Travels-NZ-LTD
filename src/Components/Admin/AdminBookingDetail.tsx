@@ -138,13 +138,13 @@ const AdminBookingDetail = ({
                       <th className="font-normal pl-2">{driver.fullName}</th>
                       <th className="font-normal">{driver.email}</th>
                       <th>
-                        <a href={driver.licenceFrontUrl ?? ""} target="_blank">
+                        <a href={driver.licenceFrontUrl ?? ""} target="_blank" rel="noreferrer">
                           <FontAwesomeIcon
                             icon={faFile}
                             className="text-2xl text-rose-300 hover:drop-shadow-2xl hover:scale-125 duration-300 ease-in-out"
                           />
                         </a>
-                        <a href={driver.licenceBackUrl ?? ""} target="_blank">
+                        <a href={driver.licenceBackUrl ?? ""} target="_blank" rel="noreferrer">
                           <FontAwesomeIcon
                             icon={faFile}
                             className="text-2xl text-blue-300 hover:drop-shadow-2xl hover:scale-125 duration-300 ease-in-out ml-2"
@@ -183,7 +183,7 @@ const AdminBookingDetail = ({
 };
 
 export default AdminBookingDetail;
-function closeModal() {
-  throw new Error("Function not implemented.");
-}
+// function closeModal() {
+//   throw new Error("Function not implemented.");
+// }
 

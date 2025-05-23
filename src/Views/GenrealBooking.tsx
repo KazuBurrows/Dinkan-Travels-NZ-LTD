@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import Calendar from "react-calendar";
 // import "react-calendar/dist/Calendar.css"; // Default styles
 
-import highlander from "../assets/images/22-Toyota-Highlander-White- side.PNG";
 import PopupModal from "../Components/PopupModal";
 import { Contact, Driver, Booking, Car, fleetImages } from "../types/models";
 import PopupNewDriverModal from "../Components/PopupNewDriverModal";

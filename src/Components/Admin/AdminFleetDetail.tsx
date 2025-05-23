@@ -1,8 +1,7 @@
 import React, {useState} from "react";
 
 import { Car, fleetImages } from "../../types/models";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFile } from "@fortawesome/free-solid-svg-icons";
+
 
 
 interface AdminFleetDetailProps {
