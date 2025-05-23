@@ -1,4 +1,3 @@
-import React, {useState} from "react";
 
 import { Car, fleetImages } from "../../types/models";
 

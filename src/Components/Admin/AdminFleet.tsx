@@ -12,10 +12,10 @@ function AdminFleet() {
 
   const [fleet, setFleet] = useState<Car[]>([]);
 
-  const openModal = (car: Car) => {
-    setIsModalOpen(true);
-    setSelectedCar(car);
-  };
+  // const openModal = (car: Car) => {
+  //   setIsModalOpen(true);
+  //   setSelectedCar(car);
+  // };
 
   const openNewCarModal = () => {
     setIsNewCarModalOpen(true);

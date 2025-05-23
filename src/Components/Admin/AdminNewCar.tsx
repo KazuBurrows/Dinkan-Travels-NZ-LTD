@@ -1,7 +1,5 @@
 import React, { useState } from "react";
 
-import { Car } from "../../types/models";
-
 interface AdminNewCarProps {
   isOpen: boolean;
   onClose: () => void;

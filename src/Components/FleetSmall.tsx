@@ -1,8 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faSquareArrowUpRight,
-  faArrowAltCircleLeft,
-  faArrowAltCircleRight,
+  faSquareArrowUpRight
 } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
 import { Car, fleetImages } from "../types/models";
