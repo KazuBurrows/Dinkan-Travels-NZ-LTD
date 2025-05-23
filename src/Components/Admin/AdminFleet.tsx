@@ -8,7 +8,7 @@ import AdminNewCar from "./AdminNewCar";
 function AdminFleet() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isNewCarModalOpen, setIsNewCarModalOpen] = useState(false);
-  const [selectedCar, setSelectedCar] = useState<Car>();
+  const [selectedCar] = useState<Car>();
 
   const [fleet, setFleet] = useState<Car[]>([]);
 
