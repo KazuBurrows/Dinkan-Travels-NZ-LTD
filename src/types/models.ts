@@ -1,3 +1,11 @@
+import highlandertoyota2022white from "../assets/images/highlander-toyota-2022-white.PNG";
+import carnivalkia2022white from "../assets/images/carnival-kia-2022-white.png";
+export const fleetImages: Record<string, string> = {
+  "highlander-toyota-2022-white": highlandertoyota2022white,
+  "carnival-kia-2022-white": carnivalkia2022white,
+};
+
+
 export interface Contact {
   email: string;
   firstName: string;
@@ -12,6 +20,8 @@ export interface Driver {
   fullName: string | null;
   licenceFront: File | null;
   licenceBack: File | null;
+  licenceFrontUrl: string | null;
+  licenceBackUrl: string | null;
 }
 
 
@@ -24,15 +34,25 @@ export interface Booking {
   total_price: number;
   paid_total: number;
   status: string;
+  drivers: Driver[];
 }
 
 
-export type Car = {
+export interface Car {
   id: string;
-  brand: string;
+  carId: string;
+  make: string;
   model: string;
   year: number;
+  body: string;
+  plate: string;
+  colour: string;
+  fuelType: string;
+  ccRating: number;
+  fuelEconomy: number;
   seats: number;
-  price: number;
-  img: string;
-};
+  pricePerDay: number;
+  drive: string;
+  transmission: string;
+}
+

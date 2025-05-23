@@ -4,19 +4,25 @@ import Calendar from "react-calendar";
 
 import highlander from "../assets/images/22-Toyota-Highlander-White- side.PNG";
 import PopupModal from "../Components/PopupModal";
-import { Contact, Driver, Booking, Car } from "../types/models";
+import { Contact, Driver, Booking, Car, fleetImages } from "../types/models";
 import PopupNewDriverModal from "../Components/PopupNewDriverModal";
-
-
 
 const car: Car = {
   id: "2022-toyota-highlander",
-  brand: "Toyota",
+  make: "Toyota",
   model: "Highlander",
   year: 2022,
   seats: 7,
-  price: 120.95,
-  img: highlander,
+  pricePerDay: 120.95,
+  carId: "",
+  body: "",
+  plate: "",
+  colour: "",
+  fuelType: "",
+  ccRating: 0,
+  fuelEconomy: 0,
+  drive: "",
+  transmission: "",
 };
 
 function formatDateToNZString(date: Date | null): string {
@@ -88,8 +94,6 @@ const toFormData = (bookingRequest: any): FormData => {
 
   return formData;
 };
-
-
 
 function GeneralBooking() {
   const [contactFirstName, setContactFirstName] = useState<string>("");
@@ -184,8 +188,8 @@ function GeneralBooking() {
       mobile: contactMobile,
     };
 
-
     const bookingRequest = {
+      carId: car.id,
       pickupDate: pickupDate,
       dropoffDate: dropoffDate,
       contact: contact,
@@ -194,7 +198,8 @@ function GeneralBooking() {
 
     const formData = toFormData(bookingRequest);
 
-    const url = "https://kazukicomapi.azurewebsites.net/api/PostBooking?"; // Your Azure API endpoint
+    // const url = "https://kazukicomapi.azurewebsites.net/api/PostBooking?"; // Your Azure API endpoint
+    const url = "http://localhost:7071/api/PostBooking?"; // Your Azure API endpoint
     try {
       const response = await fetch(url, {
         method: "POST",
@@ -215,37 +220,37 @@ function GeneralBooking() {
   };
   // END Submission confirmation modal
 
-  
-useEffect(() => {
-  const fetchBookings = async () => {
-    try {
-      const response = await fetch("https://kazukicomapi.azurewebsites.net/api/GetBookings?");
-      if (!response.ok) {
-        throw new Error("Failed to fetch bookings");
-      }
-
-      const data: Booking[] = await response.json();
-      console.log(data);
-
-      data.forEach((booking) => {
-        const newDates = getDateRange(
-          new Date(booking.pickup_date),
-          new Date(booking.dropoff_date)
+  useEffect(() => {
+    const fetchBookings = async () => {
+      try {
+        const response = await fetch(
+          "https://kazukicomapi.azurewebsites.net/api/GetBookings?"
         );
+        if (!response.ok) {
+          throw new Error("Failed to fetch bookings");
+        }
 
-        // use functional update to avoid stale bookedDates
-        setBookedDates(prev => [...prev, ...newDates]);
-      });
-    } catch (err: any) {
-      // setError(err.message || "Unknown error");
-    } finally {
-      // setLoading(false);
-    }
-  };
+        const data: Booking[] = await response.json();
+        console.log(data);
 
-  fetchBookings();
-}, []);
+        data.forEach((booking) => {
+          const newDates = getDateRange(
+            new Date(booking.pickup_date),
+            new Date(booking.dropoff_date)
+          );
 
+          // use functional update to avoid stale bookedDates
+          setBookedDates((prev) => [...prev, ...newDates]);
+        });
+      } catch (err: any) {
+        // setError(err.message || "Unknown error");
+      } finally {
+        // setLoading(false);
+      }
+    };
+
+    fetchBookings();
+  }, []);
 
   return (
     <div className="h-full bg-neutral-100 px-16 py-8 inter-font">
@@ -331,8 +336,8 @@ useEffect(() => {
             </h3>
             <img
               className="w-[350px] mx-auto"
-              src={car.img}
-              alt={car.img.toString()}
+              src={fleetImages[0]}
+              alt={fleetImages[0]}
             />
             <p>details of car here...</p>
           </div>
@@ -340,7 +345,11 @@ useEffect(() => {
             <label className="text-2xl font-semibold">Total Price:</label>
             <h2 className="text-3xl font-bold text-sky-400 ml-auto">
               $
-              {calculateTotalPrice(bookingDates[0], bookingDates[1], car.price)}{" "}
+              {calculateTotalPrice(
+                bookingDates[0],
+                bookingDates[1],
+                car.pricePerDay
+              )}{" "}
               <span className="text-sm text-neutral-500">Incl GST</span>
             </h2>
           </div>

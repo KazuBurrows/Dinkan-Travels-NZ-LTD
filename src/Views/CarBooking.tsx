@@ -1,5 +1,6 @@
 // import { useParams } from "react-router-dom";
-import highlander from "../assets/images/22-Toyota-Highlander-White- side.PNG";
+import { fleetImages } from "../types/models";
+
 
 type Car = {
   id: string;
@@ -18,7 +19,7 @@ const car: Car = {
   year: 2022,
   seats: 7,
   price: 120.95,
-  img: highlander,
+  img: fleetImages["highlander-toyota-2022-white"],
 };
 
 function CarBooking() {

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import AdminBookingDetail from "./AdminBookingDetail";
-import { Booking } from "../../types/models";
+import { Booking, Driver } from "../../types/models";
 
 const AdminBookings = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -35,7 +35,19 @@ const AdminBookings = () => {
             total_price: b.total_price,
             paid_total: b.paid_total,
             status: b.status,
+            drivers: [],
           };
+          const drivers: Driver[] = b.drivers.map((d, index) => ({
+            id: `driver-${index}`, // or use a real unique ID
+            email: d.email || null,
+            fullName: d.fullName || null,
+            licenceFront: null,
+            licenceBack: null,
+            licenceFrontUrl: d.licenceFrontUrl || null,
+            licenceBackUrl: d.licenceBackUrl || null,
+          }));
+          currBooking.drivers = drivers;
+
           tempBookings.push(currBooking);
         });
         setBookings(tempBookings);

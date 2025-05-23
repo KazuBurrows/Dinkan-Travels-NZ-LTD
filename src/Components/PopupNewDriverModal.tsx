@@ -123,7 +123,11 @@ const PopupNewDriverModal = ({
         <div className="flex justify-center gap-4">
           <button
             className="bg-green-500 text-white font-bold py-2 px-4 rounded"
-            onClick={() => onConfirm({ id, fullName, email, licenceFront, licenceBack})}
+            onClick={() => onConfirm({
+              id, fullName, email, licenceFront, licenceBack,
+              licenceFrontUrl: null,
+              licenceBackUrl: null
+            })}
           >
             Confirm
           </button>
