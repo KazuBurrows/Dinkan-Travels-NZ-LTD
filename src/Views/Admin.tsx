@@ -20,15 +20,16 @@ const Admin = () => {
         <ul>
           {navItems.map((item) => (
             <li key={item.label}>
-              <a
-                onClick={() => setActiveView(item.component)}
-                className={`cursor-pointer flex items-center gap-3 hover:bg-gray-700 p-2 rounded transition-colors ${
-                  activeView === item.component ? "bg-gray-700" : ""
-                }`}
-                href="#"
-              >
-                <span>{item.label}</span>
-              </a>
+              <button
+  onClick={() => setActiveView(item.component)}
+  className={`cursor-pointer flex items-center gap-3 hover:bg-gray-700 p-2 rounded transition-colors ${
+    activeView === item.component ? "bg-gray-700" : ""
+  }`}
+>
+  <span>{item.label}</span>
+</button>
+
+
             </li>
           ))}
         </ul>
