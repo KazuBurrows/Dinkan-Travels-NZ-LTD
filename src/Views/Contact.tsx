@@ -26,12 +26,12 @@ function Contact() {
 
           <div>
             <p className="font-semibold">Mobile:</p>
-            <p>+64 12 345 6789</p>
+            <p>+64 22 095 2899</p>
           </div>
 
           <div>
             <p className="font-semibold">Pickup Location:</p>
-            <p>123 Main Street, Christchurch 8011, New Zealand</p>
+            <p>Airport Road, Christchurch International Airport</p>
           </div>
 
           <div>

@@ -35,15 +35,6 @@ function Footer() {
           >
             <FontAwesomeIcon icon={faInstagram} />
           </a>
-          <a
-            href="https://twitter.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-blue-400 transition"
-            aria-label="Twitter"
-          >
-            <FontAwesomeIcon icon={faTwitter} />
-          </a>
         </div>
       </div>
     </footer>
