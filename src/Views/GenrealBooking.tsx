@@ -3,26 +3,9 @@ import Calendar from "react-calendar";
 // import "react-calendar/dist/Calendar.css"; // Default styles
 
 import PopupModal from "../Components/PopupModal";
-import { Contact, Driver, Booking, Car, fleetImages } from "../types/models";
+import { Contact, Driver, Car, fleetImages } from "../types/models";
 import PopupNewDriverModal from "../Components/PopupNewDriverModal";
-
-const car: Car = {
-  id: "2022-toyota-highlander",
-  make: "Toyota",
-  model: "Highlander",
-  year: 2022,
-  seats: 7,
-  pricePerDay: 120.95,
-  carId: "",
-  body: "",
-  plate: "",
-  colour: "",
-  fuelType: "",
-  ccRating: 0,
-  fuelEconomy: 0,
-  drive: "",
-  transmission: "",
-};
+import Navbar from "../Components/Navbar";
 
 function formatDateToNZString(date: Date | null): string {
   if (!date) return "";
@@ -67,6 +50,7 @@ const toFormData = (bookingRequest: any): FormData => {
   const formData = new FormData();
 
   // Add simple fields
+  formData.append("carId", bookingRequest.carId);
   formData.append("pickupDate", bookingRequest.pickupDate);
   formData.append("dropoffDate", bookingRequest.dropoffDate);
   formData.append("contact.firstName", bookingRequest.contact.firstName);
@@ -95,12 +79,15 @@ const toFormData = (bookingRequest: any): FormData => {
 };
 
 function GeneralBooking() {
+  const [fleet, setFleet] = useState<Car[]>([]);
+  const [selectedCarId, setSelectedCarId] = useState<string>("");
+
   const [contactFirstName, setContactFirstName] = useState<string>("");
   const [contactLastName, setContactLastName] = useState<string>("");
   const [contactEmail, setContactEmail] = useState<string>("");
   const [contactMobile, setContactMobile] = useState<string>("");
 
-  const [bookedDates, setBookedDates] = useState<Date[]>([]);
+  const [bookedDates] = useState<Date[]>([]);
   const setBookingDate = (value: Date) => {
     if (bookingDates[0] && bookingDates[1]) {
       // if both 'startDate' and 'endDate' values are set
@@ -119,17 +106,17 @@ function GeneralBooking() {
     null,
   ]);
 
-  function getDateRange(startDate: Date, endDate: Date) {
-    const dates = [];
-    const currentDate = new Date(startDate);
+  // function getDateRange(startDate: Date, endDate: Date) {
+  //   const dates = [];
+  //   const currentDate = new Date(startDate);
 
-    while (currentDate <= endDate) {
-      dates.push(new Date(currentDate)); // clone the date
-      currentDate.setDate(currentDate.getDate() + 1); // go to next day
-    }
+  //   while (currentDate <= endDate) {
+  //     dates.push(new Date(currentDate)); // clone the date
+  //     currentDate.setDate(currentDate.getDate() + 1); // go to next day
+  //   }
 
-    return dates;
-  }
+  //   return dates;
+  // }
 
   // START New driver modal
   const [isNewDriverModalOpen, setIsNewDriverModalOpen] = useState(false);
@@ -188,17 +175,17 @@ function GeneralBooking() {
     };
 
     const bookingRequest = {
-      carId: car.id,
+      carId: selectedCarId,
       pickupDate: pickupDate,
       dropoffDate: dropoffDate,
       contact: contact,
       drivers: drivers,
     };
-
+// console.log("carid", selectedCarId)
     const formData = toFormData(bookingRequest);
 
-    // const url = "https://kazukicomapi.azurewebsites.net/api/PostBooking?"; // Your Azure API endpoint
-    const url = "http://localhost:7071/api/PostBooking?"; // Your Azure API endpoint
+    const url = "https://kazukicomapi.azurewebsites.net/api/PostBooking?"; // Your Azure API endpoint
+    // const url = "http://localhost:7071/api/PostBooking?"; // Your Azure API endpoint
     try {
       const response = await fetch(url, {
         method: "POST",
@@ -215,32 +202,79 @@ function GeneralBooking() {
       console.error("Error:", error);
     }
 
+    setContactFirstName("");
+    setContactLastName("");
+    setContactEmail("");
+    setContactMobile("");
+    setBookingDates([null, null]);
+    setDrivers([]);
+
+    alert("Booking request submitted. We'll be in touch shortly!");
+
     closeModal();
+    window.location.replace('/');
   };
   // END Submission confirmation modal
 
   useEffect(() => {
-    const fetchBookings = async () => {
+    // const fetchBookings = async () => {
+    //   try {
+    //     const response = await fetch(
+    //       "https://kazukicomapi.azurewebsites.net/api/GetReservedBookings?"
+    //     );
+    //     if (!response.ok) {
+    //       throw new Error("Failed to fetch bookings");
+    //     }
+
+    //     const data: Booking[] = await response.json();
+    //     console.log(data);
+
+    //     data.forEach((booking) => {
+    //       const newDates = getDateRange(
+    //         new Date(booking.pickup_date),
+    //         new Date(booking.dropoff_date)
+    //       );
+
+    //       // use functional update to avoid stale bookedDates
+    //       setBookedDates((prev) => [...prev, ...newDates]);
+    //     });
+    //   } catch (err: any) {
+    //     // setError(err.message || "Unknown error");
+    //   } finally {
+    //     // setLoading(false);
+    //   }
+    // };
+
+    const fetchFleet = async () => {
       try {
         const response = await fetch(
-          "https://kazukicomapi.azurewebsites.net/api/GetBookings?"
+          "https://kazukicomapi.azurewebsites.net/api/GetFleet"
         );
         if (!response.ok) {
           throw new Error("Failed to fetch bookings");
         }
 
-        const data: Booking[] = await response.json();
-        console.log(data);
+        const rawData = await response.json();
 
-        data.forEach((booking) => {
-          const newDates = getDateRange(
-            new Date(booking.pickup_date),
-            new Date(booking.dropoff_date)
-          );
+        const cars: Car[] = rawData.map((item: any) => ({
+          id: item.id, // if missing, assign default or generate
+          carId: item.car_id,
+          make: item.make,
+          model: item.model,
+          year: item.year,
+          body: item.body || "",
+          plate: item.plate || "",
+          colour: item.colour || "",
+          fuelType: item.fuel_type || "",
+          ccRating: item.cc_rating || 0,
+          fuelEconomy: item.fuel_economy || 0,
+          seats: item.seats || 0,
+          pricePerDay: item.price_per_day,
+          drive: item.drive || "",
+          transmission: item.transmission || "",
+        }));
 
-          // use functional update to avoid stale bookedDates
-          setBookedDates((prev) => [...prev, ...newDates]);
-        });
+        setFleet(cars);
       } catch (err: any) {
         // setError(err.message || "Unknown error");
       } finally {
@@ -248,90 +282,240 @@ function GeneralBooking() {
       }
     };
 
-    fetchBookings();
+    // fetchBookings();
+    fetchFleet();
   }, []);
+  const selectedCar = fleet.find((car) => car.id === selectedCarId);
 
   return (
-    <div className="h-full bg-neutral-100 px-16 py-8 inter-font">
-      <div className="h-[600px] relative my-6 mx-auto flex justify-center items-center gap-x-4">
-        <div className="flex-[4] text-center flex flex-col justify-center bg-white rounded-3xl h-full">
-          <Calendar
-            onChange={(val) => {
-              // console.log(val);
-              if (val instanceof Date) {
-                // setValue(val);
-                setBookingDate(val);
-              }
-            }}
-            value={bookingDates[0]}
-            tileDisabled={({ date }) =>
-              bookedDates.some((d) => d.toDateString() === date.toDateString())
-            }
-            tileClassName={({ date, view }) => {
-              const classes: string[] = [];
-
-              if (
+    <>
+      <Navbar />
+      {/* DESKTOP VIEW START */}
+      <div className="h-full bg-neutral-100 px-16 py-8 inter-font lg:block hidden">
+        <div className="h-[600px] relative my-6 mx-auto flex justify-center items-center gap-x-4">
+          <div className="flex-[4] text-center flex flex-col justify-center bg-white rounded-3xl h-full">
+            <Calendar
+              onChange={(val) => {
+                // console.log(val);
+                if (val instanceof Date) {
+                  // setValue(val);
+                  setBookingDate(val);
+                }
+              }}
+              value={bookingDates[0]}
+              tileDisabled={({ date }) =>
                 bookedDates.some(
                   (d) => d.toDateString() === date.toDateString()
                 )
-              ) {
-                classes.push("booked-date");
               }
-              // console.log(bookingDates[0] + " : " + bookingDates[1]);
+              tileClassName={({ date, view }) => {
+                const classes: string[] = [];
 
-              if (
-                bookingDates[0] instanceof Date &&
-                view === "month" &&
-                date.toDateString() === bookingDates[0].toDateString()
-              ) {
-                classes.push("selected-date-start");
-              }
+                if (
+                  bookedDates.some(
+                    (d) => d.toDateString() === date.toDateString()
+                  )
+                ) {
+                  classes.push("booked-date");
+                }
+                // console.log(bookingDates[0] + " : " + bookingDates[1]);
 
-              if (
-                bookingDates[1] instanceof Date &&
-                view === "month" &&
-                date.toDateString() === bookingDates[1].toDateString()
-              ) {
-                classes.push("selected-date-end");
-              }
+                if (
+                  bookingDates[0] instanceof Date &&
+                  view === "month" &&
+                  date.toDateString() === bookingDates[0].toDateString()
+                ) {
+                  classes.push("selected-date-start");
+                }
 
-              return classes.join(" ") || undefined;
-            }}
-            className="w-full p-12"
-          />
-        </div>
-        <div className="flex-[2] flex flex-col gap-4 h-full">
-          <div className="bg-white p-8 rounded-3xl h-1/5">
-            <div className="flex gap-4 justify-center">
+                if (
+                  bookingDates[1] instanceof Date &&
+                  view === "month" &&
+                  date.toDateString() === bookingDates[1].toDateString()
+                ) {
+                  classes.push("selected-date-end");
+                }
+
+                return classes.join(" ") || undefined;
+              }}
+              className="w-full p-12"
+            />
+          </div>
+          <div className="flex-[2] flex flex-col gap-4 h-full">
+            <div className="bg-white p-8 rounded-3xl h-1/5">
+              <div className="flex gap-4 justify-center">
+                <div>
+                  <label className="ml-2 text-lg text-neutral-600">
+                    Pickup Date
+                  </label>
+                  <input
+                    className="w-full px-4 py-2 bg-neutral-100 rounded-full"
+                    type="date"
+                    id="pickup-date"
+                    value={formatDateToNZString(bookingDates[0])}
+                    onChange={(e) => setBookingDate(new Date(e.target.value))}
+                  />
+                </div>
+                <div>
+                  <label className="ml-2 text-lg text-neutral-600">
+                    Dropoff Date
+                  </label>
+                  <input
+                    className="w-full px-4 py-2 bg-neutral-100 rounded-full"
+                    type="date"
+                    id="dropoff-date"
+                    value={formatDateToNZString(bookingDates[1])}
+                    onChange={(e) => setBookingDate(new Date(e.target.value))}
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="bg-white px-8 pt-4 rounded-3xl h-full">
               <div>
+                <label htmlFor="car-select">Choose a vehicle:</label>
+                <select
+                  id="car-select"
+                  value={selectedCarId}
+                  onChange={(e) => setSelectedCarId(e.target.value)}
+                >
+                  <option value="">-- Select a vehicle --</option>
+                  {fleet.map((car) => (
+                    <option key={car.id} value={car.id}>
+                      {car.year} {car.make} {car.model} - {car.colour}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {selectedCar && (
+                <>
+                  <h3 className="text-3xl font-semibold uppercase text-center py-4">
+                    {selectedCar.year} {selectedCar.model}
+                  </h3>
+                  <img
+                    className="w-[350px] mx-auto"
+                    src={
+                      fleetImages[
+                        `${selectedCar.model}-${selectedCar.make}-${selectedCar.year}-white`.toLowerCase()
+                      ]
+                    }
+                    alt={selectedCar.model}
+                  />
+                  <p className="text-center">{selectedCar.pricePerDay}</p>
+                  <div className="w-full py-8 rounded-3xl flex h-1/5 items-center mt-4">
+                    <label className="text-2xl font-semibold">
+                      Total Price:
+                    </label>
+                    <h2 className="text-3xl font-bold text-sky-400 ml-auto">
+                      $
+                      {calculateTotalPrice(
+                        bookingDates[0],
+                        bookingDates[1],
+                        selectedCar.pricePerDay
+                      )}{" "}
+                      <span className="text-sm text-neutral-500">Incl GST</span>
+                    </h2>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="flex gap-x-4 overflow-x-auto">
+          <PopupNewDriverModal
+            isOpen={isNewDriverModalOpen}
+            onConfirm={addDriver}
+            onCancel={closeNewDriverModal}
+          ></PopupNewDriverModal>
+          <div className="flex-[4] bg-white rounded-3xl px-16 py-8 min-w-0 overflow-hidden">
+            <div className="gap-8">
+              <h2 className="text-3xl font-semibold text-center my-4">
+                Drivers
+              </h2>
+              <div id="drivers">
+                <table
+                  id="drivers-table"
+                  className="bg-neutral-100 rounded-t-2xl justify-evenly w-full text-center"
+                >
+                  <tr className="text-lg">
+                    <th className="py-2">Full Name</th>
+                    <th>Email</th>
+                    <th></th>
+                  </tr>
+                </table>
+              </div>
+              <div className="flex justify-center my-4">
+                <button
+                  className="bg-green-300 py-2 px-4 text-xl text-white font-bold rounded-full"
+                  onClick={openNewDriverModal}
+                >
+                  +
+                </button>
+              </div>{" "}
+            </div>
+          </div>
+          <form className="flex-[2] bg-white rounded-3xl px-16 py-8 min-w-0 overflow-hidden">
+            <h2 className="text-3xl font-semibold text-center my-4">
+              Contact Information
+            </h2>
+            <div className="gap-8">
+              <div className="flex flex-col flex-[1] my-4">
                 <label className="ml-2 text-lg text-neutral-600">
-                  Pickup Date
+                  First Name
                 </label>
                 <input
-                  className="w-full px-4 py-2 bg-neutral-100 rounded-full"
-                  type="date"
-                  id="pickup-date"
-                  value={formatDateToNZString(bookingDates[0])}
-                  onChange={(e) => setBookingDate(new Date(e.target.value))}
+                  className="bg-neutral-100 rounded-full px-4 py-2"
+                  onChange={(e) => setContactFirstName(e.target.value)}
                 />
               </div>
-              <div>
+              <div className="flex flex-col flex-[1] my-4">
                 <label className="ml-2 text-lg text-neutral-600">
-                  Dropoff Date
+                  Last Name
                 </label>
                 <input
-                  className="w-full px-4 py-2 bg-neutral-100 rounded-full"
-                  type="date"
-                  id="dropoff-date"
-                  value={formatDateToNZString(bookingDates[1])}
-                  onChange={(e) => setBookingDate(new Date(e.target.value))}
+                  className="bg-neutral-100 rounded-full px-4 py-2"
+                  onChange={(e) => setContactLastName(e.target.value)}
+                />
+              </div>
+              <div className="flex flex-col flex-[1] my-4">
+                <label className="ml-2 text-lg text-neutral-600">Email</label>
+                <input
+                  className="bg-neutral-100 rounded-full px-4 py-2"
+                  onChange={(e) => setContactEmail(e.target.value)}
+                />
+              </div>
+              <div className="flex flex-col flex-[1] my-4">
+                <label className="ml-2 text-lg text-neutral-600">Mobile</label>
+                <input
+                  className="bg-neutral-100 rounded-full px-4 py-2"
+                  onChange={(e) => setContactMobile(e.target.value)}
                 />
               </div>
             </div>
-          </div>
-          <div className="bg-white p-8 rounded-3xl h-3/5">
+          </form>
+        </div>
+        <div className="flex justify-center my-4">
+          <button
+            className="bg-green-300 py-2 px-4 text-xl text-white font-bold rounded-full"
+            onClick={openModal}
+          >
+            Submit
+          </button>
+        </div>
+        <PopupModal
+          isOpen={isModalOpen}
+          onConfirm={handleConfirm}
+          onCancel={closeModal}
+        />
+      </div>
+      {/* DESKTOP VIEW END */}
+
+      {/* MOBILE VIEW START */}
+      <div className="h-full bg-neutral-100 px-2 py-8 inter-font lg:hidden block">
+        <div className="h-full relative my-6 mx-auto justify-center items-center gap-x-4">
+          <div className="bg-white p-8 rounded-3xl h-3/5 my-4">
             <h3 className="text-3xl font-semibold uppercase text-center py-4">
-              {car.year} {car.model}
+              {/* {car.year} {car.model} */}
             </h3>
             <img
               className="w-[350px] mx-auto"
@@ -340,104 +524,189 @@ function GeneralBooking() {
             />
             <p>details of car here...</p>
           </div>
-          <div className="bg-white p-8 rounded-3xl flex h-1/5 items-center">
-            <label className="text-2xl font-semibold">Total Price:</label>
-            <h2 className="text-3xl font-bold text-sky-400 ml-auto">
-              $
-              {calculateTotalPrice(
-                bookingDates[0],
-                bookingDates[1],
-                car.pricePerDay
-              )}{" "}
-              <span className="text-sm text-neutral-500">Incl GST</span>
-            </h2>
-          </div>
-        </div>
-      </div>
+          <div className="text-center justify-center bg-white rounded-3xl h-full py-8">
+            <Calendar
+              onChange={(val) => {
+                // console.log(val);
+                if (val instanceof Date) {
+                  // setValue(val);
+                  setBookingDate(val);
+                }
+              }}
+              value={bookingDates[0]}
+              tileDisabled={({ date }) =>
+                bookedDates.some(
+                  (d) => d.toDateString() === date.toDateString()
+                )
+              }
+              tileClassName={({ date, view }) => {
+                const classes: string[] = [];
 
-      <div className="flex gap-x-4 overflow-x-auto">
-        <PopupNewDriverModal
-          isOpen={isNewDriverModalOpen}
-          onConfirm={addDriver}
-          onCancel={closeNewDriverModal}
-        ></PopupNewDriverModal>
-        <div className="flex-[4] bg-white rounded-3xl px-16 py-8 min-w-0 overflow-hidden">
-          <div className="gap-8">
-            <h2 className="text-3xl font-semibold text-center my-4">Drivers</h2>
-            <div id="drivers">
-              <table
-                id="drivers-table"
-                className="bg-neutral-100 rounded-t-2xl justify-evenly w-full text-center"
-              >
-                <tr className="text-lg">
-                  <th className="py-2">Full Name</th>
-                  <th>Email</th>
-                  <th></th>
-                </tr>
-              </table>
+                if (
+                  bookedDates.some(
+                    (d) => d.toDateString() === date.toDateString()
+                  )
+                ) {
+                  classes.push("booked-date");
+                }
+                // console.log(bookingDates[0] + " : " + bookingDates[1]);
+
+                if (
+                  bookingDates[0] instanceof Date &&
+                  view === "month" &&
+                  date.toDateString() === bookingDates[0].toDateString()
+                ) {
+                  classes.push("selected-date-start");
+                }
+
+                if (
+                  bookingDates[1] instanceof Date &&
+                  view === "month" &&
+                  date.toDateString() === bookingDates[1].toDateString()
+                ) {
+                  classes.push("selected-date-end");
+                }
+
+                return classes.join(" ") || undefined;
+              }}
+              className="w-full p-2"
+            />
+          </div>
+          <div className="gap-4 h-full my-4">
+            <div className="bg-white p-8 rounded-3xl h-1/5">
+              <div className="gap-4 justify-center">
+                <div className="my-4">
+                  <label className="ml-2 text-lg text-neutral-600">
+                    Pickup Date
+                  </label>
+                  <input
+                    className="w-full px-4 py-2 bg-neutral-100 rounded-full"
+                    type="date"
+                    id="pickup-date"
+                    value={formatDateToNZString(bookingDates[0])}
+                    onChange={(e) => setBookingDate(new Date(e.target.value))}
+                  />
+                </div>
+                <div>
+                  <label className="ml-2 text-lg text-neutral-600">
+                    Dropoff Date
+                  </label>
+                  <input
+                    className="w-full px-4 py-2 bg-neutral-100 rounded-full"
+                    type="date"
+                    id="dropoff-date"
+                    value={formatDateToNZString(bookingDates[1])}
+                    onChange={(e) => setBookingDate(new Date(e.target.value))}
+                  />
+                </div>
+              </div>
             </div>
-            <div className="flex justify-center my-4">
-              <button
-                className="bg-green-300 py-2 px-4 text-xl text-white font-bold rounded-full"
-                onClick={openNewDriverModal}
-              >
-                +
-              </button>
-            </div>{" "}
+
+            <div className="bg-white p-8 rounded-3xl flex h-1/5 items-center my-4">
+              <label className="text-2xl font-semibold">Total Price:</label>
+              <h2 className="text-3xl font-bold text-sky-400 ml-auto">
+                $
+                {calculateTotalPrice(
+                  bookingDates[0],
+                  bookingDates[1],
+                  // car.pricePerDay
+                  1
+                )}{" "}
+                <span className="text-sm text-neutral-500">Incl GST</span>
+              </h2>
+            </div>
           </div>
         </div>
-        <form className="flex-[2] bg-white rounded-3xl px-16 py-8 min-w-0 overflow-hidden">
-          <h2 className="text-3xl font-semibold text-center my-4">
-            Contact Information
-          </h2>
-          <div className="gap-8">
-            <div className="flex flex-col flex-[1] my-4">
-              <label className="ml-2 text-lg text-neutral-600">
-                First Name
-              </label>
-              <input
-                className="bg-neutral-100 rounded-full px-4 py-2"
-                onChange={(e) => setContactFirstName(e.target.value)}
-              />
-            </div>
-            <div className="flex flex-col flex-[1] my-4">
-              <label className="ml-2 text-lg text-neutral-600">Last Name</label>
-              <input
-                className="bg-neutral-100 rounded-full px-4 py-2"
-                onChange={(e) => setContactLastName(e.target.value)}
-              />
-            </div>
-            <div className="flex flex-col flex-[1] my-4">
-              <label className="ml-2 text-lg text-neutral-600">Email</label>
-              <input
-                className="bg-neutral-100 rounded-full px-4 py-2"
-                onChange={(e) => setContactEmail(e.target.value)}
-              />
-            </div>
-            <div className="flex flex-col flex-[1] my-4">
-              <label className="ml-2 text-lg text-neutral-600">Mobile</label>
-              <input
-                className="bg-neutral-100 rounded-full px-4 py-2"
-                onChange={(e) => setContactMobile(e.target.value)}
-              />
+
+        <div className="gap-x-4 overflow-x-auto">
+          <PopupNewDriverModal
+            isOpen={isNewDriverModalOpen}
+            onConfirm={addDriver}
+            onCancel={closeNewDriverModal}
+          ></PopupNewDriverModal>
+          <div className="bg-white rounded-3xl px-2 py-8 min-w-0 overflow-hidden">
+            <div className="gap-8">
+              <h2 className="text-3xl font-semibold text-center my-4">
+                Drivers
+              </h2>
+              <div id="drivers">
+                <table
+                  id="drivers-table"
+                  className="bg-neutral-100 rounded-t-2xl justify-evenly w-full text-center"
+                >
+                  <tr className="text-lg">
+                    <th className="py-2">Full Name</th>
+                    <th>Email</th>
+                    <th></th>
+                  </tr>
+                </table>
+              </div>
+              <div className="flex justify-center my-4">
+                <button
+                  className="bg-green-300 py-2 px-4 text-xl text-white font-bold rounded-full"
+                  onClick={openNewDriverModal}
+                >
+                  +
+                </button>
+              </div>{" "}
             </div>
           </div>
-        </form>
+          <form className="bg-white rounded-3xl px-4 py-8 min-w-0 overflow-hidden my-4">
+            <h2 className="text-3xl font-semibold text-center my-4">
+              Contact Information
+            </h2>
+            <div className="gap-8">
+              <div className="flex flex-col flex-[1] my-4">
+                <label className="ml-2 text-lg text-neutral-600">
+                  First Name
+                </label>
+                <input
+                  className="bg-neutral-100 rounded-full px-4 py-2"
+                  onChange={(e) => setContactFirstName(e.target.value)}
+                />
+              </div>
+              <div className="flex flex-col flex-[1] my-4">
+                <label className="ml-2 text-lg text-neutral-600">
+                  Last Name
+                </label>
+                <input
+                  className="bg-neutral-100 rounded-full px-4 py-2"
+                  onChange={(e) => setContactLastName(e.target.value)}
+                />
+              </div>
+              <div className="flex flex-col flex-[1] my-4">
+                <label className="ml-2 text-lg text-neutral-600">Email</label>
+                <input
+                  className="bg-neutral-100 rounded-full px-4 py-2"
+                  onChange={(e) => setContactEmail(e.target.value)}
+                />
+              </div>
+              <div className="flex flex-col flex-[1] my-4">
+                <label className="ml-2 text-lg text-neutral-600">Mobile</label>
+                <input
+                  className="bg-neutral-100 rounded-full px-4 py-2"
+                  onChange={(e) => setContactMobile(e.target.value)}
+                />
+              </div>
+            </div>
+          </form>
+        </div>
+        <div className="flex justify-center my-4">
+          <button
+            className="bg-green-300 py-2 px-4 text-xl text-white font-bold rounded-full"
+            onClick={openModal}
+          >
+            Submit
+          </button>
+        </div>
+        <PopupModal
+          isOpen={isModalOpen}
+          onConfirm={handleConfirm}
+          onCancel={closeModal}
+        />
       </div>
-      <div className="flex justify-center my-4">
-        <button
-          className="bg-green-300 py-2 px-4 text-xl text-white font-bold rounded-full"
-          onClick={openModal}
-        >
-          Submit
-        </button>
-      </div>
-      <PopupModal
-        isOpen={isModalOpen}
-        onConfirm={handleConfirm}
-        onCancel={closeModal}
-      />
-    </div>
+      {/* MOBILE VIEW END */}
+    </>
   );
 }
 

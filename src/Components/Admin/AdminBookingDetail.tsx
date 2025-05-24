@@ -44,8 +44,8 @@ const AdminBookingDetail = ({
     formData.append("status", status);
     formData.append("comments", comments);
 
-    // const url = "https://kazukicomapi.azurewebsites.net/api/UpdateStatusBooking?"; // Your Azure API endpoint
-    const url = "http://localhost:7071/api/UpdateStatusBooking"; // Your Azure API endpoint
+    const url = "https://kazukicomapi.azurewebsites.net/api/UpdateStatusBooking?"; // Your Azure API endpoint
+    // const url = "http://localhost:7071/api/UpdateStatusBooking"; // Your Azure API endpoint
     try {
       const response = await fetch(url, {
         method: "POST",

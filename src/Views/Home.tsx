@@ -5,10 +5,13 @@ import { faSquareArrowUpRight } from "@fortawesome/free-solid-svg-icons";
 import Hero from "../Components/Hero";
 import FleetSmall from "../Components/FleetSmall";
 import About from "../Components/About";
+import Navbar from "../Components/Navbar";
+import Footer from "../Components/Footer";
 // #023e7d
 // #ffd500
 function Home() {
   return (
+    <>
     <div className="h-full bg-[#ffd500] md:px-16 px-4 py-8 inter-font overflow-x-hidden">
       <a
         href="/booking"
@@ -21,10 +24,13 @@ function Home() {
         />
       </a>
 
+      <Navbar />
       <Hero></Hero>
       <FleetSmall></FleetSmall>
       <About></About>
     </div>
+    <Footer />
+    </>
   );
 }
 

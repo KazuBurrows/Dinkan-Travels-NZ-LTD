@@ -99,10 +99,10 @@ function FleetSmall() {
                   className="w-[200px] mx-auto"
                   src={
                     fleetImages[
-                      `${car.model}-${car.make}-${car.year}-white`.toLowerCase()
+                      `${car.model}-${car.make}-${car.year}-${car.colour}`.toLowerCase()
                     ]
                   }
-                  alt={`${car.model} ${car.make} ${car.year}`}
+                  alt={`${car.model} ${car.make} ${car.year}-${car.colour}`}
                 />
                 <h2 className="text-2xl font-semibold">
                   {car.model} {car.make}
@@ -145,7 +145,7 @@ function FleetSmall() {
                   className="w-[300px] mx-auto"
                   src={
                     fleetImages[
-                      `${car.model}-${car.make}-${car.year}-white`.toLowerCase()
+                      `${car.model}-${car.make}-${car.year}-${car.colour}`.toLowerCase()
                     ]
                   }
                   alt={`${car.model} ${car.make} ${car.year}`}

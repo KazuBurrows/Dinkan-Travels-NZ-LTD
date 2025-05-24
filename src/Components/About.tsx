@@ -75,19 +75,19 @@ function About() {
           </h2>
           <div className="grid grid-cols-3 gap-4  py-20">
             {/* LEFT COLUMN */}
-            <div className="ml-auto">
+            {/* <div className="ml-auto">
               <div className="bg-black w-80 h-80 rounded-3xl"></div>
-            </div>
+            </div> */}
 
             {/* MIDDLE COLUMN */}
-            <div className="mx-auto">
+            {/* <div className="mx-auto">
               <div className="bg-black w-80 h-80 rounded-3xl"></div>
-            </div>
+            </div> */}
 
             {/* RIGHT COLUMN */}
-            <div className="mr-auto">
+            {/* <div className="mr-auto">
               <div className="bg-black w-80 h-80 rounded-3xl"></div>
-            </div>
+            </div> */}
           </div>
         </div>
         {/* ROW THREE END */}
@@ -163,11 +163,11 @@ function About() {
           </h2>
 
           {/* IMAGE ROW */}
-          <div className="flex flex-col items-center gap-8 py-20">
+          {/* <div className="flex flex-col items-center gap-8 py-20">
             <div className="bg-black w-80 h-80 rounded-3xl"></div>
             <div className="bg-black w-80 h-80 rounded-3xl"></div>
             <div className="bg-black w-80 h-80 rounded-3xl"></div>
-          </div>
+          </div> */}
         </div>
         {/* ROW THREE END */}
       </div>

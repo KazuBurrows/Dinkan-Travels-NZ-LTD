@@ -1,8 +1,14 @@
 import highlandertoyota2022white from "../assets/images/highlander-toyota-2022-white.PNG";
 import carnivalkia2022white from "../assets/images/carnival-kia-2022-white.png";
+import carnivalkia2023green from "../assets/images/carnival-kia-2023-green.png";
+import carnivalkia2023grey from "../assets/images/carnival-kia-2023-grey.png";
+import hiacetoyota2022white from "../assets/images/hiace-toyota-2022-white.png";
 export const fleetImages: Record<string, string> = {
   "highlander-toyota-2022-white": highlandertoyota2022white,
   "carnival-kia-2022-white": carnivalkia2022white,
+  "carnival-kia-2023-green": carnivalkia2023green,
+  "carnival-kia-2023-grey": carnivalkia2023grey,
+  "hiace-toyota-2022-white": hiacetoyota2022white,
 };
 
 
