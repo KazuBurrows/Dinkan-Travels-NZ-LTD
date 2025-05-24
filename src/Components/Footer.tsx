@@ -5,9 +5,8 @@ import {
   faTwitter,
 } from "@fortawesome/free-brands-svg-icons";
 
-export interface FooterProps {}
 
-function Footer({}: FooterProps) {
+function Footer() {
   return (
      <footer className="bg-gray-900 text-white px-6 py-6">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">

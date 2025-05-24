@@ -9,9 +9,7 @@ const navItems: NavItem[] = [
   { label: "Contact", value: "/contact" },
 ];
 
-export interface NavbarProps {}
-
-function Navbar({}: NavbarProps) {
+function Navbar() {
   return (
     <nav className="fixed top-2 left-1/2 transform -translate-x-1/2 z-50 w-max">
       <ul className="flex bg-[#ffd500] bg-opacity-60 rounded-full shadow-md overflow-hidden">
