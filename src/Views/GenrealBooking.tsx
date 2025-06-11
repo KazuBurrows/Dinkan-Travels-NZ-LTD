@@ -6,6 +6,7 @@ import PopupModal from "../Components/PopupModal";
 import { Contact, Driver, Car, fleetImages } from "../types/models";
 import PopupNewDriverModal from "../Components/PopupNewDriverModal";
 import Navbar from "../Components/Navbar";
+import Footer from "../Components/Footer";
 
 function formatDateToNZString(date: Date | null): string {
   if (!date) return "";
@@ -295,51 +296,57 @@ function GeneralBooking() {
         <div className="h-[600px] relative my-6 mx-auto flex justify-center items-center gap-x-4">
           <div className="flex-[4] text-center flex flex-col justify-center bg-white rounded-3xl h-full">
             <Calendar
-              onChange={(val) => {
-                // console.log(val);
-                if (val instanceof Date) {
-                  // setValue(val);
-                  setBookingDate(val);
-                }
-              }}
-              value={bookingDates[0]}
-              tileDisabled={({ date }) =>
-                bookedDates.some(
-                  (d) => d.toDateString() === date.toDateString()
-                )
-              }
-              tileClassName={({ date, view }) => {
-                const classes: string[] = [];
+  onChange={(val) => {
+    if (val instanceof Date) {
+      setBookingDate(val);
+    }
+  }}
+  value={bookingDates[0]}
+  minDate={new Date()} // Prevents selection of past dates
+  tileDisabled={({ date }) =>
+    bookedDates.some(
+      (d) => d.toDateString() === date.toDateString()
+    )
+  }
+  tileClassName={({ date, view }) => {
+  const classes: string[] = [];
 
-                if (
-                  bookedDates.some(
-                    (d) => d.toDateString() === date.toDateString()
-                  )
-                ) {
-                  classes.push("booked-date");
-                }
-                // console.log(bookingDates[0] + " : " + bookingDates[1]);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0); // Normalize to start of day
 
-                if (
-                  bookingDates[0] instanceof Date &&
-                  view === "month" &&
-                  date.toDateString() === bookingDates[0].toDateString()
-                ) {
-                  classes.push("selected-date-start");
-                }
+  if (view === "month") {
+    if (date < today) {
+      classes.push("past-date");
+    }
 
-                if (
-                  bookingDates[1] instanceof Date &&
-                  view === "month" &&
-                  date.toDateString() === bookingDates[1].toDateString()
-                ) {
-                  classes.push("selected-date-end");
-                }
+    if (
+      bookedDates.some(
+        (d) => d.toDateString() === date.toDateString()
+      )
+    ) {
+      classes.push("booked-date");
+    }
 
-                return classes.join(" ") || undefined;
-              }}
-              className="w-full p-12"
-            />
+    if (
+      bookingDates[0] instanceof Date &&
+      date.toDateString() === bookingDates[0].toDateString()
+    ) {
+      classes.push("selected-date-start");
+    }
+
+    if (
+      bookingDates[1] instanceof Date &&
+      date.toDateString() === bookingDates[1].toDateString()
+    ) {
+      classes.push("selected-date-end");
+    }
+  }
+
+  return classes.join(" ") || undefined;
+}}
+  className="w-full p-12"
+/>
+
           </div>
           <div className="flex-[2] flex flex-col gap-4 h-full">
             <div className="bg-white p-8 rounded-3xl h-1/5">
@@ -706,6 +713,7 @@ function GeneralBooking() {
         />
       </div>
       {/* MOBILE VIEW END */}
+      <Footer />
     </>
   );
 }

@@ -4,7 +4,7 @@ import {
   faInstagram,
   // faTwitter,
 } from "@fortawesome/free-brands-svg-icons";
-
+import logo from "../assets/images/dinkan-travels-logo.png"
 
 function Footer() {
   return (
@@ -12,7 +12,8 @@ function Footer() {
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
         {/* Logo / Brand */}
         <div className="md:text-6xl text-xl font-bold">
-          <span className="text-[#ffd500]">Dinkan</span>Travels
+          
+          <span className="text-[#ffd500]"><img className="md:w-[125px] w-[80px] inline" src={logo} alt="Dinkan Travels"/> Dinkan</span>Travels
         </div>
 
         {/* Social Media Links */}

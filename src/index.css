@@ -91,3 +91,10 @@
     border-radius: 50px;
     padding: .2em .6em;
   }
+
+  .react-calendar__tile.past-date {
+  background-color: #e5e7eb; /* Tailwind gray-200 */
+  color: #9ca3af;            /* Tailwind gray-400 */
+  pointer-events: none;      /* Optional: disables hover/click */
+  opacity: 0.6;
+}

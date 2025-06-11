@@ -1,4 +1,5 @@
 import bg from "../assets/images/hyundai-motor-group-Ax5hexSdvCg-unsplash.jpg";
+import logo from "../assets/images/dinkan-travels-logo.png";
 
 function Hero() {
   return (
@@ -14,7 +15,7 @@ function Hero() {
 
         {/* Top content (e.g., Logo) */}
         <div className="flex justify-center relative z-10 py-4">
-          <h1 className="text-4xl text-[#003566] font-bold mb-4">Logo</h1>
+          <h1 className="text-4xl text-[#003566] font-bold mb-4"><img className="md:w-[125px] w-[80px] mt-8" alt="Dinkan Travels" src={logo}/></h1>
         </div>
 
         {/* Bottom content box */}
