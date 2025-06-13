@@ -14,9 +14,9 @@ function Hero() {
         <div className="absolute inset-0 bg-[#003566] bg-opacity-20 z-0"></div>
 
         {/* Top content (e.g., Logo) */}
-        <div className="flex justify-center relative z-10 py-4">
+        {/* <div className="flex justify-center relative z-10 py-4">
           <h1 className="text-4xl text-[#003566] font-bold mb-4"></h1>
-        </div>
+        </div> */}
 
         {/* Bottom content box */}
         <div className="2xl:w-6/12 lg:w-7/12 md:w-10/12 pb-[5%] mx-[5%] text-[#ffd500] mt-auto md:p-12 rounded-lg overflow-hidden break-words relative z-10">

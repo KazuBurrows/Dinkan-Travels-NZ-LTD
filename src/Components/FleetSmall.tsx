@@ -52,8 +52,8 @@ function FleetSmall() {
 
   
   useEffect(() => {
-  // Run Keen update when fleet data changes
   instanceRef.current?.update();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
 }, [fleet]);
 
   const [sliderRef, instanceRef] = useKeenSlider<HTMLDivElement>(
