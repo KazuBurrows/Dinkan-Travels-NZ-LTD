@@ -39,7 +39,7 @@ function FleetSmall() {
           transmission: item.transmission,
         }));
 
-        setFleet(data);
+        setFleet([...data, ...data]);
       } catch (err: any) {
         // setError(err.message || "Unknown error");
       } finally {
@@ -50,14 +50,26 @@ function FleetSmall() {
     fetchFleet();
   }, []);
 
-  const [sliderRef] = useKeenSlider<HTMLDivElement>({
-    loop: true,
-    mode: "free-snap",
-    slides: {
-      perView: 1,
-      spacing: 15,
-    },
-  });
+  
+  useEffect(() => {
+  // Run Keen update when fleet data changes
+  instanceRef.current?.update();
+}, [fleet]);
+
+  const [sliderRef, instanceRef] = useKeenSlider<HTMLDivElement>(
+  fleet.length > 0
+    ? {
+        loop: true,
+        mode: "snap",
+        // resize: true,
+        slides: {
+          origin: "center",
+          perView: 1,
+          spacing: 15,
+        },
+      }
+    : undefined // ✅ Use undefined instead of null
+)
 
   return (
     <div className="w-full pt-12 mx-auto">

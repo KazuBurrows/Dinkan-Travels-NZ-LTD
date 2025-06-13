@@ -7,6 +7,7 @@ import { Contact, Driver, Car, fleetImages } from "../types/models";
 import PopupNewDriverModal from "../Components/PopupNewDriverModal";
 import Navbar from "../Components/Navbar";
 import Footer from "../Components/Footer";
+import LoadingModal from "../Components/Loading";
 
 function formatDateToNZString(date: Date | null): string {
   if (!date) return "";
@@ -80,6 +81,8 @@ const toFormData = (bookingRequest: any): FormData => {
 };
 
 function GeneralBooking() {
+  const [loading, setLoading] = useState(false);
+
   const [fleet, setFleet] = useState<Car[]>([]);
   const [selectedCarId, setSelectedCarId] = useState<string>("");
 
@@ -165,6 +168,8 @@ function GeneralBooking() {
   const closeModal = () => setIsModalOpen(false);
 
   const handleConfirm = async () => {
+    setLoading(true);
+    closeModal();
     let pickupDate = bookingDates[0];
     let dropoffDate = bookingDates[1];
 
@@ -182,7 +187,6 @@ function GeneralBooking() {
       contact: contact,
       drivers: drivers,
     };
-// console.log("carid", selectedCarId)
     const formData = toFormData(bookingRequest);
 
     const url = "https://kazukicomapi.azurewebsites.net/api/PostBooking?"; // Your Azure API endpoint
@@ -212,8 +216,10 @@ function GeneralBooking() {
 
     alert("Booking request submitted. We'll be in touch shortly!");
 
-    closeModal();
+    
     window.location.replace('/');
+
+    setLoading(false);
   };
   // END Submission confirmation modal
 
@@ -290,6 +296,8 @@ function GeneralBooking() {
 
   return (
     <>
+      <LoadingModal isOpen={loading} message="Please wait..." />
+
       <Navbar />
       {/* DESKTOP VIEW START */}
       <div className="h-full bg-neutral-100 px-16 py-8 inter-font lg:block hidden">
@@ -402,7 +410,7 @@ function GeneralBooking() {
                     className="w-[350px] mx-auto"
                     src={
                       fleetImages[
-                        `${selectedCar.model}-${selectedCar.make}-${selectedCar.year}-white`.toLowerCase()
+                        `${selectedCar.model}-${selectedCar.make}-${selectedCar.year}-${selectedCar.colour}`.toLowerCase()
                       ]
                     }
                     alt={selectedCar.model}

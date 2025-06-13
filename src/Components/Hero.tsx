@@ -15,13 +15,13 @@ function Hero() {
 
         {/* Top content (e.g., Logo) */}
         <div className="flex justify-center relative z-10 py-4">
-          <h1 className="text-4xl text-[#003566] font-bold mb-4"><img className="md:w-[125px] w-[80px] mt-8" alt="Dinkan Travels" src={logo}/></h1>
+          <h1 className="text-4xl text-[#003566] font-bold mb-4"></h1>
         </div>
 
         {/* Bottom content box */}
         <div className="2xl:w-6/12 lg:w-7/12 md:w-10/12 pb-[5%] mx-[5%] text-[#ffd500] mt-auto md:p-12 rounded-lg overflow-hidden break-words relative z-10">
           <h1 className="2xl:text-9xl xl:text-9xl md:text-8xl sm:9xl text-6xl font-bold py-4 uppercase break-words">
-            Dinkan Travels
+            <img className="md:w-[425px] sm:w-[160px] w-[110px]" alt="Dinkan Travels" src={logo}/>
           </h1>
           <p className="text-xl font-semibold break-words md:block hidden">
             Reliable short-term vehicle hire for travel, business, or personal

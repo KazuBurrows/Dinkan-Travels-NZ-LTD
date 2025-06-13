@@ -4,6 +4,8 @@ import { Booking, Car, fleetImages } from "../../types/models";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFile } from "@fortawesome/free-solid-svg-icons";
 
+import LoadingModal from "../Loading";
+
 const car: Car = {
   id: "2022-toyota-highlander",
   make: "Toyota",
@@ -34,9 +36,10 @@ const AdminBookingDetail = ({
   onClose,
 }: AdminBookingDetailProps) => {
   const [comments, setComments] = useState<string>("");
-  
+  const [loading, setLoading] = useState(false);
   // START Submission confirmation modal
   const handleConfirm = async (status: string) => {
+    setLoading(true);
 
     var formData = new FormData();
     formData.append("id", String(booking?.id));
@@ -63,10 +66,14 @@ const AdminBookingDetail = ({
     }
 
     onClose();
+    setLoading(false)
   };
   // END Submission confirmation modal
 
   return isOpen ? (
+    <>
+              <LoadingModal isOpen={loading} message="Please wait..." />
+
     <div className="absolute inset-0 flex justify-center items-center bg-gray-500 bg-opacity-50 z-50">
       <div className="relative bg-white p-8 rounded-3xl max-h-[80vh] overflow-y-auto w-full max-w-xl">
         {booking && (
@@ -179,6 +186,7 @@ const AdminBookingDetail = ({
         )}
       </div>
     </div>
+    </>
   ) : null;
 };
 
