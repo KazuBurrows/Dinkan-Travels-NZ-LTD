@@ -304,56 +304,56 @@ function GeneralBooking() {
         <div className="h-[600px] relative my-6 mx-auto flex justify-center items-center gap-x-4">
           <div className="flex-[4] text-center flex flex-col justify-center bg-white rounded-3xl h-full">
             <Calendar
-  onChange={(val) => {
-    if (val instanceof Date) {
-      setBookingDate(val);
-    }
-  }}
-  value={bookingDates[0]}
-  minDate={new Date()} // Prevents selection of past dates
-  tileDisabled={({ date }) =>
-    bookedDates.some(
-      (d) => d.toDateString() === date.toDateString()
-    )
-  }
-  tileClassName={({ date, view }) => {
-  const classes: string[] = [];
+              onChange={(val) => {
+                if (val instanceof Date) {
+                  setBookingDate(val);
+                }
+              }}
+              value={bookingDates[0]}
+              minDate={new Date()} // Prevents selection of past dates
+              tileDisabled={({ date }) =>
+                bookedDates.some(
+                  (d) => d.toDateString() === date.toDateString()
+                )
+              }
+              tileClassName={({ date, view }) => {
+              const classes: string[] = [];
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0); // Normalize to start of day
+              const today = new Date();
+              today.setHours(0, 0, 0, 0); // Normalize to start of day
 
-  if (view === "month") {
-    if (date < today) {
-      classes.push("past-date");
-    }
+              if (view === "month") {
+                if (date < today) {
+                  classes.push("past-date");
+                }
 
-    if (
-      bookedDates.some(
-        (d) => d.toDateString() === date.toDateString()
-      )
-    ) {
-      classes.push("booked-date");
-    }
+                if (
+                  bookedDates.some(
+                    (d) => d.toDateString() === date.toDateString()
+                  )
+                ) {
+                  classes.push("booked-date");
+                }
 
-    if (
-      bookingDates[0] instanceof Date &&
-      date.toDateString() === bookingDates[0].toDateString()
-    ) {
-      classes.push("selected-date-start");
-    }
+                if (
+                  bookingDates[0] instanceof Date &&
+                  date.toDateString() === bookingDates[0].toDateString()
+                ) {
+                  classes.push("selected-date-start");
+                }
 
-    if (
-      bookingDates[1] instanceof Date &&
-      date.toDateString() === bookingDates[1].toDateString()
-    ) {
-      classes.push("selected-date-end");
-    }
-  }
+                if (
+                  bookingDates[1] instanceof Date &&
+                  date.toDateString() === bookingDates[1].toDateString()
+                ) {
+                  classes.push("selected-date-end");
+                }
+              }
 
-  return classes.join(" ") || undefined;
-}}
-  className="w-full p-12"
-/>
+              return classes.join(" ") || undefined;
+            }}
+              className="w-full p-12"
+            />
 
           </div>
           <div className="flex-[2] flex flex-col gap-4 h-full">
@@ -415,7 +415,9 @@ function GeneralBooking() {
                     }
                     alt={selectedCar.model}
                   />
-                  <p className="text-center">{selectedCar.pricePerDay}</p>
+                  <div>
+                    <p className="text-4xl font-bold text-center">${selectedCar.pricePerDay}<span className="text-sm font-normal"> per day</span></p>
+                  </div>
                   <div className="w-full py-8 rounded-3xl flex h-1/5 items-center mt-4">
                     <label className="text-2xl font-semibold">
                       Total Price:
@@ -514,7 +516,7 @@ function GeneralBooking() {
             className="bg-green-300 py-2 px-4 text-xl text-white font-bold rounded-full"
             onClick={openModal}
           >
-            Submit
+            Submit Booking
           </button>
         </div>
         <PopupModal
@@ -529,33 +531,67 @@ function GeneralBooking() {
       <div className="h-full bg-neutral-100 px-2 py-8 inter-font lg:hidden block">
         <div className="h-full relative my-6 mx-auto justify-center items-center gap-x-4">
           <div className="bg-white p-8 rounded-3xl h-3/5 my-4">
-            <h3 className="text-3xl font-semibold uppercase text-center py-4">
-              {/* {car.year} {car.model} */}
-            </h3>
-            <img
-              className="w-[350px] mx-auto"
-              src={fleetImages[0]}
-              alt={fleetImages[0]}
-            />
-            <p>details of car here...</p>
+            
+            <div>
+                <label htmlFor="car-select">Choose a vehicle:</label>
+                <select
+                  id="car-select"
+                  value={selectedCarId}
+                  onChange={(e) => setSelectedCarId(e.target.value)}
+                >
+                  <option value="">-- Select a vehicle --</option>
+                  {fleet.map((car) => (
+                    <option key={car.id} value={car.id}>
+                      {car.year} {car.make} {car.model} - {car.colour}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {selectedCar && (
+                <>
+                  <h3 className="text-3xl font-semibold uppercase text-center py-4">
+                    {selectedCar.year} {selectedCar.model}
+                  </h3>
+                  <img
+                    className="w-[350px] mx-auto"
+                    src={
+                      fleetImages[
+                        `${selectedCar.model}-${selectedCar.make}-${selectedCar.year}-${selectedCar.colour}`.toLowerCase()
+                      ]
+                    }
+                    alt={selectedCar.model}
+                  />
+                  <div>
+                    <p className="text-4xl font-bold text-center">${selectedCar.pricePerDay}<span className="text-sm font-normal"> per day</span></p>
+                  </div>
+                  
+                </>
+              )}
           </div>
           <div className="text-center justify-center bg-white rounded-3xl h-full py-8">
             <Calendar
               onChange={(val) => {
-                // console.log(val);
                 if (val instanceof Date) {
-                  // setValue(val);
                   setBookingDate(val);
                 }
               }}
               value={bookingDates[0]}
+              minDate={new Date()} // Prevents selection of past dates
               tileDisabled={({ date }) =>
                 bookedDates.some(
                   (d) => d.toDateString() === date.toDateString()
                 )
               }
               tileClassName={({ date, view }) => {
-                const classes: string[] = [];
+              const classes: string[] = [];
+
+              const today = new Date();
+              today.setHours(0, 0, 0, 0); // Normalize to start of day
+
+              if (view === "month") {
+                if (date < today) {
+                  classes.push("past-date");
+                }
 
                 if (
                   bookedDates.some(
@@ -564,11 +600,9 @@ function GeneralBooking() {
                 ) {
                   classes.push("booked-date");
                 }
-                // console.log(bookingDates[0] + " : " + bookingDates[1]);
 
                 if (
                   bookingDates[0] instanceof Date &&
-                  view === "month" &&
                   date.toDateString() === bookingDates[0].toDateString()
                 ) {
                   classes.push("selected-date-start");
@@ -576,15 +610,15 @@ function GeneralBooking() {
 
                 if (
                   bookingDates[1] instanceof Date &&
-                  view === "month" &&
                   date.toDateString() === bookingDates[1].toDateString()
                 ) {
                   classes.push("selected-date-end");
                 }
+              }
 
-                return classes.join(" ") || undefined;
-              }}
-              className="w-full p-2"
+              return classes.join(" ") || undefined;
+            }}
+              className="w-full p-12"
             />
           </div>
           <div className="gap-4 h-full my-4">
@@ -617,17 +651,21 @@ function GeneralBooking() {
               </div>
             </div>
 
-            <div className="bg-white p-8 rounded-3xl flex h-1/5 items-center my-4">
-              <label className="text-2xl font-semibold">Total Price:</label>
-              <h2 className="text-3xl font-bold text-sky-400 ml-auto">
+            <div className="w-full py-8 rounded-3xl flex h-1/5 items-center mt-4">
+              <label className="text-2xl font-semibold ml-auto pr-2">
+                Total Price:
+              </label>
+              <h2 className="text-3xl font-bold text-sky-400">
                 $
-                {calculateTotalPrice(
+                {selectedCar && (
+                <>{calculateTotalPrice(
                   bookingDates[0],
                   bookingDates[1],
-                  // car.pricePerDay
-                  1
+                  selectedCar.pricePerDay
                 )}{" "}
-                <span className="text-sm text-neutral-500">Incl GST</span>
+                <span className="text-sm text-neutral-500">Incl GST</span></>
+                )}
+                
               </h2>
             </div>
           </div>
@@ -711,7 +749,7 @@ function GeneralBooking() {
             className="bg-green-300 py-2 px-4 text-xl text-white font-bold rounded-full"
             onClick={openModal}
           >
-            Submit
+            Submit Booking
           </button>
         </div>
         <PopupModal

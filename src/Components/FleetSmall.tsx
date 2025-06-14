@@ -1,6 +1,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faSquareArrowUpRight
+  faSquareArrowUpRight,
+  faShare
 } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
 import { Car, fleetImages } from "../types/models";
@@ -177,8 +178,16 @@ function FleetSmall() {
           </div>
         ))}
         {/* MOBILE VIEW END */}
+        <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-center text-white py-4">
+          <FontAwesomeIcon
+            icon={faShare}
+            className="text-5xl text-white ml-2 hover:drop-shadow-2xl hover:scale-125 duration-300 ease-in-out"
+          />
+          <br/>
+          Swipe for more!
+        </div>
+        
       </div>
-      <p className="text-center text-xl text-white py-4">Swipe me!</p>
     </div>
   );
 }
